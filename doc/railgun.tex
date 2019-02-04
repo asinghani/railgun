@@ -110,10 +110,10 @@ Now that we have computed the magnitude of the magnetic field of the rails, we p
     F = I \int_{(w/2)}^{(d - w/2)} \frac{\mu_0 I x}{4\pi a \sqrt{x^2 + a^2}} da = 
     \frac{\mu_0 I^2 x}{4\pi} \int_{(w/2)}^{(d - w/2)} \frac{da}{a \sqrt{x^2 + a^2}}
 \end{equation}
-Integrating yields the final expression for force on the projectile when it is a given distance through the barrel (where $x = 0$ is the start of the barrel):
+Integrating (and doubling, because there are two rails) yields the final expression for force on the projectile when it is a given distance through the barrel (where $x = 0$ is the start of the barrel):
 \begin{equation}
     F(I, x) =
-    \frac{\mu_0 I^2 \log(d - w/2) - \log(x\sqrt{(d - w/2)^2 + x^2} + x^2) + \log(w/2) - \log(x\sqrt{(w/2)^2 + x^2} + x^2)}{4\pi}
+    \frac{2\mu_0 I^2 \log(d - w/2) - \log(x\sqrt{(d - w/2)^2 + x^2} + x^2) + \log(w/2) - \log(x\sqrt{(w/2)^2 + x^2} + x^2)}{4\pi}
     \label{eqn:eqn1}
 \end{equation}
 
@@ -131,16 +131,16 @@ R_{\text{rail}} = \frac{\int\rho\text{ }dl}{A}
 \end{equation}
 Given the width of the rail is $w$ and the thickness of the rail is $k$:
 \begin{equation}
-R_{\text{rail}} = \frac{\int \rho(l) dl}{A} = \frac{\rho_{0}(1 - 20\alpha) \int dl + \rho_{0}\alpha \int T(l) dl}{wk}
+R_{\text{rail}} = \frac{\int_{0}^{x} \rho(l) dl}{A} = \frac{\rho_{0}(1 - 20\alpha) \int_{0}^{x} dl + \rho_{0}\alpha \int_{0}^{x} T(l) dl}{wk}
 \end{equation}
 \begin{equation}
-R_{\text{rail}} = \frac{\rho_{0}l(1 - 20\alpha) + \rho_{0}\alpha (\int T(l) dl)}{wk}
+R_{\text{rail}} = \frac{\rho_{0}x(1 - 20\alpha) + \rho_{0}\alpha (\int_{0}^{x} T(l) dl)}{wk}
 \label{eqn:eqn2}
 \end{equation}
 
 Assuming the resistance of the projectile is negligible, we find that the total resistance is (given that $R_{\text{circuit}}$ is the additional resistance of the capacitor circuit and wiring):
 \begin{equation}
-R_{\text{total}} = 2R_{\text{rail}} + R_{\text{circuit}} = 2\frac{\rho_{0}l(1 - 20\alpha) + \rho_{0}\alpha (\int T(l) dl)}{wk} + R_{\text{circuit}}
+R_{\text{total}} = 2R_{\text{rail}} + R_{\text{circuit}} = 2\frac{\rho_{0}x(1 - 20\alpha) + \rho_{0}\alpha (\int_{0}^{x} T(l) dl)}{wk} + R_{\text{circuit}}
 \label{eqn:eqn3}
 \end{equation}
 
@@ -196,11 +196,11 @@ The specific heat $c$ will depend on the metal used, and we can calculate the vo
     \Delta T = \frac{\frac{Q^2 t}{C^2 R_{total}}}{pxwkc} = \frac{Q^2 t}{pxwkc \cdot C^2 R_{rail}}
     \label{eqn:eqn6}
 \end{equation}
-We must note that the increase in temperature only applies between the start of the rail and the point $x$ meters into the rail. Therefore, it must be calculated point-by-point.
+We must note that the increase in temperature only applies between the start of the rail and the point $x$ meters into the rail. Therefore, it must be calculated for every point along the rail.
 
 \section{Results}
 
 \subsection{Implementation}
-We implement a simulation using equations \eqref{eqn:eqn1} \eqref{eqn:eqn2} \eqref{eqn:eqn3} \eqref{eqn:eqn4} \eqref{eqn:eqn5} \eqref{eqn:eqn6}. Code for the simulation can be seen:
+We implement a simulation of our proposed railgun system using equations \eqref{eqn:eqn1} \eqref{eqn:eqn2} \eqref{eqn:eqn3} \eqref{eqn:eqn4} \eqref{eqn:eqn5} \eqref{eqn:eqn6}.
 
 \end{document}
