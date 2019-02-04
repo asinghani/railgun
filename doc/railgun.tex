@@ -112,8 +112,8 @@ Now that we have computed the magnitude of the magnetic field of the rails, we p
 \end{equation}
 Integrating (and doubling, because there are two rails) yields the final expression for force on the projectile when it is a given distance through the barrel (where $x = 0$ is the start of the barrel):
 \begin{equation}
-    F(I, x) =
-    \frac{2\mu_0 I^2 \log(d - w/2) - \log(x\sqrt{(d - w/2)^2 + x^2} + x^2) + \log(w/2) - \log(x\sqrt{(w/2)^2 + x^2} + x^2)}{4\pi}
+    F =
+    \frac{2\mu_0 I^2 (\log(d - w/2) - \log(x\sqrt{(d - w/2)^2 + x^2} + x^2) - \log(w/2) + \log(x\sqrt{(w/2)^2 + x^2} + x^2))}{4\pi}
     \label{eqn:eqn1}
 \end{equation}
 
@@ -161,7 +161,7 @@ We write this in terms of time and solve for the rate of change of charge:
 \end{equation}
 In addition, we can find the initial charge as a function of voltage and capacitance:
 \begin{equation}
-    Q = \frac{V}{C}
+    Q = CV
     \label{eqn:eqn5}
 \end{equation}
 Because resistance is constantly changing, we will use Euler's method to approximate the current and charge over time.
