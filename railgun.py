@@ -1,10 +1,6 @@
 import numpy as np
 from math import log, sqrt
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib.collections import PolyCollection
 import matplotlib.pyplot as plt
-
-plt.xkcd()
 
 def ln(x):
     return log(abs(x))
@@ -16,21 +12,21 @@ def micro(x):
 
 u_over_4pi = 1e-7 # UNIVERSAL CONSTANT
 
-def run_sim(z):
+def run_sim(getty_mass, rail_separation, rail_width, rail_thickness, projectile_thickness, barrel_length, power_circuit_resistance, use_capacitor, capacitor_voltage = 0.0, total_capacitance = 0.0, fixed_voltage = 0.0):
     # Projectile mass - kg
-    m = 0.01
+    m = getty_mass + 0.001 * p * (rail_separation - rail_width) * projectile_thickness * rail_thickness
 
     # Rail separation
-    d = centi(z)
+    d = rail_separation
 
     # Rail width
-    w = d / 5.0 #centi(0.3)
+    w = rail_width
 
     # Rail thickness
-    k = centi(2)
+    k = rail_thickness
 
     # Barrel length
-    L = 0.1
+    L = barrel_length
 
     # Resistivity at 20C (metal)
     rho = 1.59e-8
@@ -39,13 +35,13 @@ def run_sim(z):
     a = 0.0038
 
     # Power circuit resistance
-    R_circuit = 0.03
+    R_circuit = power_circuit_resistance
 
     # Capacitor charge voltage
-    V = 400.0
+    V = capacitor_voltage
 
     # Total capacitance
-    C = 16 * micro(3300)
+    C = total_capacitance
 
     # Density (metal, gram per cubic meter)
     p = 10500000
@@ -68,24 +64,33 @@ def run_sim(z):
         t += DT
         x += v * DT
 
+        # Calculate Resistance
         integral_temperature_length = temperature_array.sum() / 1000.0
 
         R_rail = (rho * x * (1 - 20*a) + rho * a * integral_temperature_length) / (w*k)
         R_total = 2 * R_rail + R_circuit
 
-        I = Q / (R_total * C)
-        Q -= I * DT
 
+        # Capacitor Current
+        if use_capacitor:
+            I = Q / (R_total * C)
+            Q -= I * DT
+        else:
+            I = fixed_voltage / R_total
+
+        # Force on Projectile
         left_lim = d - w/2.0
         right_lim = w/2.0
         F = 2 * u_over_4pi * I * I * (ln(left_lim) - ln(x * sqrt(left_lim**2 + x**2) + x**2) - ln(right_lim) + ln(x * sqrt(right_lim ** 2 + x ** 2) + x**2))
 
         a = F / m
+        v += a * DT
 
         deltaT = I * I * R_rail * DT / (p * x * w * k * c)
         temperature_array[0:min(int(x * 1000), len(temperature_array))] += deltaT
 
-        v += a * DT
+        # TODO Calculate heat flow
+
 
     print("Final Position", x)
     print("Final Velocity", v)
@@ -94,31 +99,3 @@ def run_sim(z):
 
     return (x, v, t, temperature_array.max())
 
-values_x = []
-values_y = []
-values_y2 = []
-
-
-
-for i in np.linspace(0.05, 2.5, num=50).tolist():
-    for j in np.linspace(0.05, 2.5, num=50).tolist():
-        for k in np.linspace(0.05, 2.5, num=50).tolist():
-            x, v, t, temp = run_sim(i)
-            values_x.append(i)
-            values_y.append(v)
-            values_y2.append(temp)
-
-
-fig, ax1 = plt.subplots()
-ax1.set_xlabel("Rail Separation (cm) : Rail width = 1/5 rail separation")
-
-ax1.plot(values_x, values_y, color="r")
-ax1.set_ylabel("Velocity", color='r')
-
-#ax2 = ax1.twinx()
-#ax2.plot(values_x, values_y2, color="b")
-#ax2.set_ylabel("Temperature", color='b')
-plt.show()
-
-#plt.imshow(temperature_array.reshape((1, len(temperature_array))), aspect = "auto", cmap="viridis", interpolation = "bicubic")
-#plt.show()
