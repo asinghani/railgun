@@ -60,6 +60,9 @@ def run_sim(getty_mass, rail_separation, rail_width, rail_thickness, projectile_
 
     temperature_array = np.array([20.0] * int(L * 1000))
 
+    proj_temp = 20.0
+    proj_width = rail_separation - rail_width
+
     while x < L:
         t += DT
         x += v * DT
@@ -68,8 +71,8 @@ def run_sim(getty_mass, rail_separation, rail_width, rail_thickness, projectile_
         integral_temperature_length = temperature_array.sum() / 1000.0
 
         R_rail = (rho * x * (1 - 20*a) + rho * a * integral_temperature_length) / (w*k)
-        R_total = 2 * R_rail + R_circuit
-
+        R_projectile = (rho * proj_width * (1 - 20*a) + rho * a * proj_temp * proj_width) / (rail_thickness * projectile_thickness)
+        R_total = 2 * R_rail + R_projectile + R_circuit
 
         # Capacitor Current
         if use_capacitor:
@@ -87,6 +90,8 @@ def run_sim(getty_mass, rail_separation, rail_width, rail_thickness, projectile_
         v += a * DT
 
         deltaT = I * I * R_rail * DT / (p * x * w * k * c)
+        proj_temp += I * I * R_rail * DT / (p * x * w * k * c)
+
         temperature_array[0:min(int(x * 1000), len(temperature_array))] += deltaT
 
         # TODO Calculate heat flow
