@@ -13,8 +13,6 @@ def micro(x):
 u_over_4pi = 1e-7 # UNIVERSAL CONSTANT
 
 def run_sim(getty_mass, rail_separation, rail_width, rail_thickness, projectile_thickness, barrel_length, power_circuit_resistance, use_capacitor, capacitor_voltage = 0.0, total_capacitance = 0.0, fixed_voltage = 0.0):
-    # Projectile mass - kg
-    m = getty_mass + 0.001 * p * (rail_separation - rail_width) * projectile_thickness * rail_thickness
 
     # Rail separation
     d = rail_separation
@@ -49,13 +47,16 @@ def run_sim(getty_mass, rail_separation, rail_width, rail_thickness, projectile_
     # Specific heat (metal, per gram)
     c = 0.240
 
+    # Projectile mass - kg
+    m = getty_mass + 0.001 * p * (rail_separation - rail_width) * projectile_thickness * rail_thickness
+
     # Step size of simulation - seconds
-    DT = 0.001
+    DT = 0.000002
 
     ##### Persistant State
     Q = C * V
     t = 0
-    x = 0.001
+    x = 0.5
     v = 0.0
 
     temperature_array = np.array([20.0] * int(L * 1000))
@@ -63,7 +64,12 @@ def run_sim(getty_mass, rail_separation, rail_width, rail_thickness, projectile_
     proj_temp = 20.0
     proj_width = rail_separation - rail_width
 
+    iters = 0
+
+    I_initial = None
+
     while x < L:
+        iters = iters + 1
         t += DT
         x += v * DT
 
@@ -81,6 +87,9 @@ def run_sim(getty_mass, rail_separation, rail_width, rail_thickness, projectile_
         else:
             I = fixed_voltage / R_total
 
+        if I_initial is None:
+            I_initial = I
+
         # Force on Projectile
         left_lim = d - w/2.0
         right_lim = w/2.0
@@ -90,17 +99,11 @@ def run_sim(getty_mass, rail_separation, rail_width, rail_thickness, projectile_
         v += a * DT
 
         deltaT = I * I * R_rail * DT / (p * x * w * k * c)
-        proj_temp += I * I * R_rail * DT / (p * x * w * k * c)
-
         temperature_array[0:min(int(x * 1000), len(temperature_array))] += deltaT
 
-        # TODO Calculate heat flow
+        proj_temp += I * I * R_projectile * DT / (p * proj_width * projectile_thickness * rail_thickness * c)
 
+        #print(round(x, 2), round(v, 2), round(a, 2), round(F, 2), round(I, 2))
 
-    print("Final Position", x)
-    print("Final Velocity", v)
-    print("Time to exit barrel", t)
-    print("Maximum temperature", temperature_array.max())
-
-    return (x, v, t, temperature_array.max())
+    return (x, v, t, temperature_array, proj_temp, R_total, I_initial, I, iters)
 
